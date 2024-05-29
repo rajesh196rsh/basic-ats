@@ -7,6 +7,10 @@ from .models import Gender, JobStatus
 def verify_gender(gender: str) -> str:
     """
         This function verifies gender
+        Args:
+            gender: gender
+        Returns:
+            gender: updated gender
     """
     if gender.upper() == Gender.MALE:
         gender = Gender.MALE
@@ -23,6 +27,10 @@ def verify_gender(gender: str) -> str:
 def verify_job_status(job_status: str) -> str:
     """
         This function verifies gender
+        Args:
+            job_status: job status
+        Returns:
+            job_status: updated job status
     """
     if job_status.upper() == JobStatus.APPLIED:
         job_status = JobStatus.APPLIED
@@ -36,21 +44,43 @@ def verify_job_status(job_status: str) -> str:
     return job_status
 
 
-def verify_phone_number(phone_number):
+def verify_phone_number(phone_number: int) -> int:
+    """
+        This function verifies phone number
+        Args:
+            phone_number: phone number
+        Returns:
+            phone_number: updated phone number
+    """
     pattern = r'^\d{10}$'
     if re.match(pattern, str(phone_number)):
         return phone_number
     raise ValueError(f"{phone_number} is an invalid phone number.")
 
 
-def verify_email_address(email):
+def verify_email_address(email: str) -> str:
+    """
+        This function verifies email
+        Args:
+            email: email
+        Returns:
+            email: updated email
+    """
     pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if re.match(pattern, email):
         return email
     raise ValueError(f"{email} is an invalid email.")
 
 
-def validate_ceate_candidate_request_body(data):
+def validate_ceate_candidate_request_body(data: dict) -> (bool, str):
+    """
+        This function validates data required for creation of candidate
+        Args:
+            data: dict containing all details
+        Return:
+            status: True if validation is successfull
+            error: error if occured
+    """
     schema = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "title": "User Information",
@@ -108,7 +138,14 @@ def validate_ceate_candidate_request_body(data):
     return status, error
 
 
-def prepare_candidate_response_json(candidates):
+def prepare_candidate_response_json(candidates) -> list:
+    """
+        This function creates dict response
+        Args:
+            candidates: list of Candidate objects
+        Returns:
+            candidates_response: list of dict
+    """
     candidates_response = []
     for a_candidate in candidates:
         a_candidate_json = {

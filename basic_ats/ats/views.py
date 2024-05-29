@@ -8,7 +8,9 @@ from collections import defaultdict
 
 
 class CreateCandidateApi(APIView):
-
+    """
+        Create, get and update candidate
+    """
     def get(self, request, pk):
         response_status = status.HTTP_400_BAD_REQUEST
 
@@ -111,7 +113,9 @@ class CreateCandidateApi(APIView):
 
 
 class SearchCandidate(APIView):
-
+    """
+        Search candidate by its details
+    """
     def post(self, request):
         response_status = status.HTTP_400_BAD_REQUEST
         try:
@@ -152,7 +156,9 @@ class SearchCandidate(APIView):
 
 
 class SearchByName(APIView):
-
+    """
+        Search candidate by name
+    """
     def post(self, request):
         response_status = status.HTTP_400_BAD_REQUEST
 
