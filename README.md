@@ -150,3 +150,16 @@ models.py
     SUCCESSFUL_CREATION: Message indicating successful creation of a candidate.
     STATUS_UPDATION_SUCCESSFUL: Message indicating successful status update.
     INCORRECT_PAYLOAD: Error message for incorrect request payloads.
+
+### Contributing
+
+    Fork the repository.
+    Create your feature branch (git checkout -b feature/new-feature).
+    Commit your changes (git commit -am 'Add new feature').
+    Push to the branch (git push origin feature/new-feature).
+    Create a new Pull Request.
+
+### License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+Feel free to reach out if you have any questions or need further assistance!
