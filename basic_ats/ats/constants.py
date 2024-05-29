@@ -1,3 +1,4 @@
+INCORRECT_PAYLOAD = "Payload is incorrect"
 SUCCESSFUL_CREATION = "Successfully created"
 STATUS_UPDATION_SUCCESSFUL = "Status updated successfully"
 STATUS_UPDATION_FAILURE = "Status not updated"
