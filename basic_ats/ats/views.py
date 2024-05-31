@@ -120,7 +120,6 @@ class SearchCandidate(APIView):
         response_status = status.HTTP_400_BAD_REQUEST
         try:
             data = request.data
-            candidates = Candidate.objects.all()
 
             expected_salary_min = data.get("expected_salary_min")
             expected_salary_max = data.get("expected_salary_max")
@@ -131,18 +130,21 @@ class SearchCandidate(APIView):
             email = data.get("email")
             name = data.get("name")
 
+            filters = {}
             if expected_salary_min and expected_salary_max:
-                candidates = candidates.filter(experience__expected_salary__range=(expected_salary_min, expected_salary_max))
+                filters['experience__expected_salary__range'] = (expected_salary_min, expected_salary_max)
             if age_min and age_max:
-                candidates = candidates.filter(age__range=(age_min, age_max))
+                filters['age__range'] = (age_min, age_max)
             if years_of_exp_min:
-                candidates = candidates.filter(experience__years_of_exp__gte=years_of_exp_min)
+                filters['experience__years_of_exp__gte'] = years_of_exp_min
             if phone_number:
-                candidates = candidates.filter(phone_number=phone_number)
+                filters['phone_number'] = phone_number
             if email:
-                candidates = candidates.filter(email=email)
+                filters['email'] = email
             if name:
-                candidates = candidates.filter(name__icontains=name)
+                filters['name__icontains'] = name
+
+            candidates = Candidate.objects.filter(**filters)
 
             res = prepare_candidate_response_json(candidates)
             response_status = status.HTTP_200_OK
