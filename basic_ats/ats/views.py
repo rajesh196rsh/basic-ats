@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Case, When, Value, IntegerField, F, Sum, Count
+from django.db.models.functions import Lower
 from .models import Candidate, Experience, JobStatus
 from .utils import verify_gender, verify_phone_number, verify_email_address, validate_ceate_candidate_request_body, prepare_candidate_response_json, verify_job_status
 from . import constants
@@ -170,23 +172,36 @@ class SearchByName(APIView):
             if not query:
                 return Response([])
 
-            query_words = set(query.lower().split())
-            candidates = Candidate.objects.all()
-            candidate_scores = defaultdict(list)
+            query_words = query.lower().split()
 
-            for candidate in candidates:
-                name_words = set(candidate.name.lower().split())
-                if query.lower() == candidate.name.lower():
-                    score = 99
-                else:
-                    common_words = query_words & name_words
-                    score = len(common_words)
-                if score > 0:
-                    candidate_scores[score].append(candidate)
+            # Annotate candidates with exact match and word match scores
+            candidates = Candidate.objects.annotate(
+                name_lower=Lower('name'),
+                exact_match=Case(
+                    When(name_lower=query.lower(), then=Value(100)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                common_word_count=Sum(
+                    Case(
+                        *[
+                            When(name_lower__contains=word, then=Value(1))
+                            for word in query_words
+                        ],
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
+                ),
+                score=F('exact_match') + F('common_word_count')
+            )
 
-            sorted_candidates = []
-            for score in sorted(candidate_scores.keys(), reverse=True):
-                sorted_candidates.extend(candidate_scores[score])
+            # Filter out candidates with a score of greater than 0
+            candidates = candidates.filter(score__gt=0)
+
+            # sort candidates on descending order
+            sorted_candidates = candidates.order_by('-score')
+
+            sorted_candidates = list(sorted_candidates)
 
             res = prepare_candidate_response_json(sorted_candidates)
             response_status = status.HTTP_200_OK
