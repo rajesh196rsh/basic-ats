@@ -174,26 +174,31 @@ class SearchByName(APIView):
 
             query_words = query.lower().split()
 
-            # Annotate candidates with exact match and word match scores
-            candidates = Candidate.objects.annotate(
-                name_lower=Lower('name'),
-                exact_match=Case(
-                    When(name_lower=query.lower(), then=Value(100)),
-                    default=Value(0),
-                    output_field=IntegerField(),
-                ),
-                common_word_count=Sum(
-                    Case(
-                        *[
-                            When(name_lower__contains=word, then=Value(1))
-                            for word in query_words
-                        ],
+            cnt = 1
+            annotate_dict = {}
+            overall_score = None
+            for word in query_words:
+                col_name = "word_" + str(cnt)
+                annotate_dict[col_name] = Case(
+                        When(name__icontains=word, then=Value(1)),
                         default=Value(0),
-                        output_field=IntegerField(),
+                        output_field=IntegerField()
                     )
-                ),
-                score=F('exact_match') + F('common_word_count')
+                cnt = cnt+1
+                overall_score = overall_score + F(col_name) if overall_score else F(col_name)
+
+            candidates = Candidate.objects.annotate(**annotate_dict)
+            candidates = candidates.annotate(common_words_count=overall_score)
+            candidates = candidates.annotate(
+                exact_match=Case(When(name__iexact=query, then=Value(100)),
+                                 default=0,
+                                 output_field=IntegerField())
             )
+
+            candidates = candidates.annotate(
+                score=F('exact_match') + F('common_words_count')
+            )
+
 
             # Filter out candidates with a score of greater than 0
             candidates = candidates.filter(score__gt=0)
