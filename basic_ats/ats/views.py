@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import Case, When, Value, IntegerField, F, Sum, Count
 from django.db.models.functions import Lower
 from .models import Candidate, Experience, JobStatus
@@ -10,6 +12,8 @@ from collections import defaultdict
 
 
 class CreateCandidateApi(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     """
         Create, get and update candidate
     """
@@ -115,6 +119,8 @@ class CreateCandidateApi(APIView):
 
 
 class SearchCandidate(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     """
         Search candidate by its details
     """
@@ -160,6 +166,8 @@ class SearchCandidate(APIView):
 
 
 class SearchByName(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     """
         Search candidate by name
     """

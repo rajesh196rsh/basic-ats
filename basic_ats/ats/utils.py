@@ -159,7 +159,6 @@ def prepare_candidate_response_json(candidates) -> list:
             "expected_salary": a_candidate.experience.expected_salary,
             "status": a_candidate.status,
             "reason": a_candidate.reason,
-            "score": a_candidate.score
         }
         candidates_response.append(a_candidate_json)
     return candidates_response
